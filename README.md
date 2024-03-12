@@ -1,1 +1,1 @@
-# distributed-situ-oracles
+# decentralized-situ
