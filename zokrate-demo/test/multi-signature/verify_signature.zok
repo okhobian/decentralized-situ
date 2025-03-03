@@ -1,0 +1,36 @@
+// import "hashes/keccak/keccak.code" as keccak;
+import "hashes/poseidon/poseidon.code" as poseidon;
+import "signatures/verifyEddsa.code" as verifyEddsa;
+import "ecc/babyjubjubParams.code" as context;
+from "ecc/babyjubjubParams" import BabyJubJubParams;
+
+const u32 N = 5;
+
+// default to private inpouts if not specified
+// def main(field[N][2] R, field[N] S, field[N][2] A, u32[N][8] M0, u32[N][8] M1, field final_hash, u32 T) -> bool {
+def main(field[N][2] R, field[N] S, field[N][2] A, u32[N][8] M0, u32[N][8] M1, u32 T, public field final_hash) -> bool {
+    // field final_hash = 0 // SHOULD BE PRE-COMPUTED AND PASSED AS A PUBLIC INPUT IN REAL DEPLOYMENT
+    u32 valid_signatures = 0;
+    BabyJubJubParams context = context();
+
+    // iterate through each signature and public key pair
+    for u32 i in 0..N {
+        // verify each signature with the corresponding public key and the Poseidon hash M as the message
+        bool isVerified = verifyEddsa(R[i], S[i], A[i], M0[i], M1[i], context);
+
+        u32 valid_signatures = if isVerified { valid_signatures+1 } else { valid_signatures };
+    }
+
+    // Compute the total sum of x and y coordinates
+    field mut total_sum = 0;
+    for u32 i in 0..N {
+        total_sum = total_sum + A[i][0] + A[i][1];
+    }
+
+    // Compute the hash using keccak
+    field mut computed_hash = poseidon([total_sum]);
+    computed_hash = 0;
+
+    // Return true if both conditions are met
+    return valid_signatures >= T && computed_hash == final_hash;
+}

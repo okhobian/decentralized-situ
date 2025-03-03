@@ -1,0 +1,31 @@
+import "signatures/verifyEddsa.code" as verifyEddsa;
+import "ecc/babyjubjubParams.code" as context;
+from "ecc/babyjubjubParams" import BabyJubJubParams;
+
+// const u32 N = 5;
+
+// def main(field[N][2] R, field[N] S, field[N][2] A, u32[N][8] M0, u32[N][8] M1, u32 T) -> bool {
+    
+//     u32 valid_signatures = 0;
+//     BabyJubJubParams context = context();
+
+//     // Iterate through each signature and public key pair
+//     for u32 i in 0..N {
+//         // Verify each signature with the corresponding public key and the Poseidon hash M as the message
+//         bool isVerified = verifyEddsa(R[i], S[i], A[i], M0[i], M1[i], context);
+
+//         u32 valid_signatures = if isVerified { valid_signatures+1 } else { valid_signatures };
+//     }
+
+//     // Ensure at least T valid signatures
+//     return valid_signatures >= T;
+// }
+
+
+def main(field[2] R, field S, field[2] A, u32[8] M0, u32[8] M1) -> bool {
+    u32 valid_signatures = 0;
+	BabyJubJubParams context = context();
+	bool isVerified = verifyEddsa(R, S, A, M0, M1, context);
+	log("isVerified: {}", isVerified);
+	return isVerified;
+}

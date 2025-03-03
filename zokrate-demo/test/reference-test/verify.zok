@@ -1,0 +1,17 @@
+const u32 bs = 10;         // Number of training samples
+const u32 fe = 9;          // Number of features
+const u32 TREE_DEPTH = 4;  // Depth of the Merkle tree
+
+struct MerkleTreeProofStruct<DEPTH> {
+    u32[8] mut leaf;
+    bool[DEPTH] directionSelector; 
+    u32[DEPTH][8] path;
+}
+
+def data_authenticity_check(
+    field[bs][fe] x_train, field[bs][fe] x_train_sign, field[bs] y_train,
+    field[2] R, field S, field[2] A, u32[8] M0, u32[8] M1, u32[8] commitment
+) -> bool {
+    // For testing purposes, always return true
+    return true;
+}

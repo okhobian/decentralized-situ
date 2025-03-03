@@ -1,0 +1,14 @@
+Type,Name,Value
+Execution Time,Compile,19.38 seconds
+Execution Time,Setup,9.56 seconds
+Execution Time,Compute Witness,6.44 seconds
+Execution Time,Generate Proof,8.69 seconds
+Execution Time,Verify Proof,0.01 seconds
+Execution Time,Export Verifier,0.01 seconds
+File Size,out,1.46 GB
+File Size,proving.key,183.44 MB
+File Size,verification.key,18.97 KB
+File Size,witness,18.74 MB
+File Size,proof.json,8.69 KB
+File Size,verifier.sol,30.66 KB
+GAS,PER VERIFIY,1128173

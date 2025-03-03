@@ -1,0 +1,15 @@
+Type,Name,Value
+Execution Time,Compile,461.75 seconds
+Execution Time,Setup,157.00 seconds
+Execution Time,Compute Witness,55.86 seconds
+Execution Time,Generate Proof,135.31 seconds
+Execution Time,Verify Proof,0.05 seconds
+Execution Time,Export Verifier,0.02 seconds
+File Size,out,11.79 GB
+File Size,proving.key,1.47 GB
+File Size,verification.key,139.68 KB
+File Size,witness,149.87 MB
+File Size,proof.json,63.16 KB
+File Size,verifier.sol,177.13 KB
+Number of constraints, 3766519
+verify gas, 7601149

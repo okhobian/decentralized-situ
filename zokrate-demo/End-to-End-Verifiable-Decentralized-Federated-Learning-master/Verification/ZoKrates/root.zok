@@ -1,0 +1,189 @@
+from "utils/casts/field_to_u32.zok" import main as field_to_u32;
+from "utils/casts/u32_to_field.zok" import main as u32_to_field;
+from "utils/casts/field_to_u64.zok" import main as field_to_u64;
+from "utils/casts/u64_to_field.zok" import main as u64_to_field;
+from "./verify.zok" import main as data_authenticity_check;
+from "./verify.zok" import MerkleTreeProofStruct, TREE_DEPTH;
+
+const field max = 0-1;
+const field threshold= 20888242871839275222246405745257275088548364400416034343698204186575808495617;
+const u32  fe = 9;
+const u32  ac = 6;
+const field ac_f=6;
+const u32  bs = 10;
+
+def add(field a, field b, field a_sign, field b_sign)-> (field, field){
+    field a_cleansed = a_sign == 0 ? a : max-a+1;
+    field b_cleansed = b_sign == 0 ? b : max-b+1;
+    field c = ( a_sign == b_sign && a_sign == 1 ? (max+1-a_cleansed-b_cleansed) : a+b );
+    field c_sign =  c > threshold ? 1 : 0;
+    return (c, c_sign);
+}
+
+
+def subtract(field a, field b, field a_sign, field b_sign)-> (field, field){
+    field a_cleansed = a_sign==0 ? a : max-a+1;
+    field b_cleansed = b_sign==0 ? b : max-b+1;
+    field c = (a_sign != b_sign && a_sign==0? a_cleansed+b_cleansed : a-b);
+    field d = c > threshold ? 1 : 0;
+    return (c, d); 
+
+}
+
+
+def divide(field a, field b, field a_sign, field b_sign) -> (field, field){
+    field mut a_cleansed = a_sign==0 ? a : max-a+1;
+    field b_cleansed = b_sign==0 ? b : max-b+1;
+    u64 a_u64 = field_to_u64(a_cleansed);
+    u64 b_u64 = field_to_u64(b_cleansed);
+    u64 remainder = a_u64 % b_u64;
+    a_cleansed = u64_to_field(a_u64-remainder);
+    field mut res = a_cleansed / b_cleansed;
+    field sign = (a_sign == b_sign || res == 0 ? 0 : 1);
+    res = sign == 0 ? res : max+1-res;
+    return (res, sign);
+}
+
+
+def multiply(field a, field b, field a_sign, field b_sign) -> (field, field){
+    field a_cleansed = a_sign==0 ? a : max-a+1;
+    field b_cleansed = b_sign==0 ? b : max-b+1;
+    field mut res = a_cleansed * b_cleansed;
+    field sign = (a_sign==b_sign || res==0 ? 0 : 1);
+    res = sign==0 ? res : max-res+1;
+    return (res, sign);
+}
+
+
+def mse_prime(field[ac] y_true, field[ac] y_pred, field[ac] y_pred_sign, field pr)->(field[ac], field[ac]){
+    field[ac] mut result = [0;ac];
+    field[ac] mut result_sign = [0;ac];
+    for u32 i in 0..ac {
+        (field, field) mut temp = subtract(y_pred[i], y_true[i], y_pred_sign[i], 0);
+        temp = multiply(temp.0, 2, temp.1, 0);
+        (field, field) mut res = divide(temp.0, ac_f, temp.1, 0);
+        result[i] = res.0;
+        result_sign[i] = res.1;
+    }
+    return (result, result_sign);
+}
+
+
+def forward_propagation_layer(field[ac][fe] w, field[ac] b, field[fe] x, field[ac][fe] w_sign, field[ac] b_sign, field[fe] x_sign, field pr) -> (field[ac], field[ac]){
+    field[ac] mut result = b;
+    field[ac] mut result_sign = b_sign;
+    field[ac] mut wx = b;
+    field[ac] mut wx_sign = b;
+    for u32 j in 0..ac {
+        field mut temp = 0;
+        field mut temp_sign = 0;
+        for u32 i in 0..fe {
+            (field, field) t_i = multiply(w[j][i], x[i], w_sign[j][i], x_sign[i]);
+            (field, field) mut res = add(temp, t_i.0, temp_sign, t_i.1);
+            temp = res.0;
+            temp_sign = res.1;
+        }
+        (field, field) mut res = divide(temp, pr, temp_sign, 0);
+        temp = res.0;
+        temp_sign = res.1;
+
+        wx[j] = temp;
+        wx_sign[j] = temp_sign;
+    }
+
+    for u32 i in 0..ac{
+       (field, field) mut res = add(wx[i], b[i], wx_sign[i], b_sign[i]);
+       result[i] = res.0;
+       result_sign[i] = res.1;
+    }
+    return (result, result_sign);
+}
+
+def backward_propagation_layer(field[ac][fe] w, field[ac] b, field[fe] x, field[ac] output_error, field learning_rate, field pr, field[ac][fe] w_sign, field[ac] b_sign, field[fe] x_sign, field[ac] output_error_sign) -> (field[ac][fe], field[ac], field[ac][fe], field[ac]) {
+    field[ac][fe] mut w_temp = w;
+    field[ac][fe] mut w_sign_temp = w_sign;
+    field[ac] mut b_temp = b;
+    field[ac] mut b_sign_temp = b_sign;
+    for u32 i in 0..ac {
+        (field, field) temp = divide(output_error[i], learning_rate, output_error_sign[i], 0);
+        (field, field) res = subtract(b_temp[i], temp.0, b_sign_temp[i], temp.1);
+        b_temp[i] = res.0;
+        b_sign_temp[i] = res.1;
+    }
+    for u32 j in 0..fe {
+            for u32 i in 0..ac {
+                (field, field) mut temp = multiply(output_error[i], x[j], output_error_sign[i], x_sign[j]);
+                temp = divide(temp.0, learning_rate, temp.1, 0);
+                temp = divide(temp.0, pr, temp.1, 0);
+                (field, field) mut res = subtract(w_temp[i][j], temp.0, w_sign_temp[i][j], temp.1);
+                w_temp[i][j] = res.0;
+                w_sign_temp[i][j] = res.1;
+            }
+            
+    }
+    return (w_temp, b_temp, w_sign_temp, b_sign_temp);
+}
+
+//,field[bs][fe] x_train, field[bs][fe] x_train_sign ,field[bs] y_train,field learning_rate,field precision
+//def main(field[ac][fe] w, field[ac][fe] w_sign, field[ac] b, field[ac] b_sign, private field[bs][fe] x_train, private field[bs][fe] x_train_sign, private field[bs] y_train, field learning_rate, field pr, field[ac][fe] w_new, field[ac] b_new, private field[2] R, private field S, field[2] A, u32[8] M0, u32[8] M1, private MerkleTreeProofStruct<TREE_DEPTH> proof, private u32 idx) -> bool{
+def main(field[ac][fe] w, field[ac][fe] w_sign, field[ac] b, field[ac] b_sign, private field[bs][fe] x_train, private field[bs][fe] x_train_sign, private field[bs] y_train, field learning_rate, field pr, field[ac][fe] w_new, field[ac] b_new, private field[2] R, private field S, field[2] A, u32[8] M0, u32[8] M1, u32[8] commitment) -> bool{
+
+    bool isVerified = data_authenticity_check(x_train, x_train_sign, y_train, R, S, A, M0, M1, commitment);
+    assert(isVerified);
+
+    field[ac] mut output_layer = [0;ac];
+    field[ac] mut out_sign = [0;ac];
+    field[ac] mut error = [0;ac];
+    field[ac] mut error_sign = [0;ac];
+    field[ac] backward_layer = [0;ac];
+    field[fe] out = [0;fe];
+    field[ac] backward_layer_sign = [0;ac];
+    field[ac] mut y_true = [0;ac];
+
+    field[ac][fe] mut w_temp = w;
+    field[ac][fe] mut w_sign_temp = w_sign;
+    field[ac] mut b_temp = b;
+    field[ac] mut b_sign_temp = b_sign;
+
+    for u32 batch_idx in 0..bs {
+       field[fe] sample = x_train[batch_idx];
+       field[fe] sample_sign = x_train_sign[batch_idx];
+       field idx1 = y_train[batch_idx]-1;
+       for u32 i in 0..ac {
+           field idx2 = u32_to_field(i);
+           y_true[i] = idx1==idx2 ? pr : 0;
+       }
+       (field[ac], field[ac]) res = forward_propagation_layer(w_temp, b_temp, sample, w_sign_temp, b_sign_temp, sample_sign, pr);
+       output_layer = res.0;
+       out_sign = res.1;
+
+       (field[ac], field[ac]) res_error = mse_prime(y_true, output_layer, out_sign, pr);
+       error = res_error.0;
+       error_sign = res_error.1;
+       (field[ac][fe], field[ac], field[ac][fe], field[ac]) res_back = backward_propagation_layer(w_temp, b_temp, sample, error, learning_rate, pr, w_sign_temp, b_sign_temp, sample_sign, error_sign);
+       w_temp = res_back.0;
+       b_temp = res_back.1;
+       w_sign_temp = res_back.2;
+       b_sign_temp = res_back.3;
+    }
+    field mut res = 0;
+    for u32 i in 0..ac {
+        res = res + (b_temp[i] == b_new[i] ? 1 : 0);
+    }
+     for u32 j in 0..fe {
+        for u32 i in 0..ac {
+            res = res + (w_temp[i][j] == w_new[i][j] ? 1 : 0);
+        }
+    }
+
+    log("res is {}", res);
+
+    return res == u32_to_field(ac + fe * ac);
+}
+
+
+
+
+
+
+

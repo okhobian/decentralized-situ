@@ -1,0 +1,63 @@
+DEFAULT:
+  DeviceDataPath: "/home/Advancing-Blockchain-Based-Federated-Learning-Through-Verifiable-Off-Chain-Computations/Devices/Edge_Device/data"
+  IntervalDataGenerator: 1
+  NumberOfSamplesGenerated: 50
+  MessageBrokerHost: "localhost"
+  QueueBase: "Queue"
+  InputDimension: 9
+  OutputDimension: 6
+  NumberOfParticipants: 1
+  Epochs : 1
+  LearningRate: 1000
+  Precision: 10000
+  WaitingTime: 2
+  BatchSize: 10
+  Rounds : 300
+  TestFilePath: "/home/Advancing-Blockchain-Based-Federated-Learning-Through-Verifiable-Off-Chain-Computations/Devices/Edge_Device/data/test.txt"
+  TrainFilePath: "/home/Advancing-Blockchain-Based-Federated-Learning-Through-Verifiable-Off-Chain-Computations/Devices/Edge_Device/data"
+  IntervalTime: 40
+  PercentOfDataGenerated: 0.0086
+  #PerformProof: False
+  PerformProof: True
+  PerformRegistration: True
+  Gas: 100000000000000
+  #Gas: 1000000000000
+
+  ResponseVariable: "Activity"
+  EtheriumRPCServer: "http://127.0.0.1:8545"
+  FLContractAddress: "0xf1d120C423D3483bD56CaE0Fe3c5563c0144079E"  
+  VerifierContractAddress: "0xE6eEBE456cdB7a52c1BaEc0c80b6dE5601f48a65"
+  RegisterContractAddress: "0x5f4B7B55d1Dc9E795A463144331aBd448937aED4"  
+  RegisterVerifierContractAddress: "0x09C7CE03Ed7369aC7b7844FeA2426376679F2446"
+  ZokratesPath: "/home/Advancing-Blockchain-Based-Federated-Learning-Through-Verifiable-Off-Chain-Computations/Verification/ZoKrates/root.zok"
+  VerificationBase: "/home/Advancing-Blockchain-Based-Federated-Learning-Through-Verifiable-Off-Chain-Computations/Verification/SAVED_VERIFYER_10/"
+  FLContractABIPAth: "/home/Advancing-Blockchain-Based-Federated-Learning-Through-Verifiable-Off-Chain-Computations/Blockchain/Truffle/build/contracts/FederatedModel.json"
+  RContractABIPAth: "/home/Advancing-Blockchain-Based-Federated-Learning-Through-Verifiable-Off-Chain-Computations/Blockchain/Truffle/build/contracts/Registration.json"
+  AnalyticsOutBase: "/home/Advancing-Blockchain-Based-Federated-Learning-Through-Verifiable-Off-Chain-Computations/Devices/MiddleWare/Analytics/"
+  Activities : [5, 11, 12, 14, 15, 17]
+  ActivitiesEncoded : [1,2,3,4,5,6]
+  ActivityMappings:
+    2: 1
+    3: 1
+    4: 1
+    16: 15
+    6: 5
+    10: 11
+    13: 14
+    7: 1
+  ActivityEncoding:
+    5: 1
+    11: 2
+    12: 3
+    14: 4
+    15: 5
+    17: 6
+
+TEST:
+  ZokratesPath: "/home/Advancing-Blockchain-Based-Federated-Learning-Through-Verifiable-Off-Chain-Computations/Verification/ZoKrates/"
+  VerificationBase: "/home/Advancing-Blockchain-Based-Federated-Learning-Through-Verifiable-Off-Chain-Computations/Verification/SAVED_VERIFYER_10/"
+
+Registration:
+  ZokratesPath: "/home/Advancing-Blockchain-Based-Federated-Learning-Through-Verifiable-Off-Chain-Computations/CA/Zokrates/"
+  VerificationBase: "/home/Advancing-Blockchain-Based-Federated-Learning-Through-Verifiable-Off-Chain-Computations/CA/Zokrates"
+  
