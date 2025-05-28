@@ -19,7 +19,7 @@
 - [Keras-TensorFlow](https://keras.io/getting_started/) v2.13.1
 - [scikit-learn](https://scikit-learn.org/stable/install.html) v1.3.1
 
-- NOTE: other blockchain testnets and compilation methods should also work, configurations may vary.
+- *NOTE: other blockchain testnets and compilation methods should also work, configurations may vary*.
 ---
 
 ### Mutual-Learning
@@ -33,6 +33,8 @@
    ```bash
    python <script.py>  # Hyperparameters are defined at the top of each script.
    ```
+📄 [Read the earlier work](https://ieeexplore.ieee.org/abstract/document/10664316)
+
 ---
 
 ### Local Verification
