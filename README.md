@@ -15,9 +15,9 @@
 - [Truffle Ganache](https://archive.trufflesuite.com/ganache/) v7.9.2 (@ganache/cli: 0.10.2, @ganache/core: 0.10.2)
 - [Remix IDE](http://remix.ethereum.org)
 - [Zokrates](https://zokrates.github.io/gettingstarted.html) v0.8.8
-- Python 3.9
-- Keras-TensorFlow v2.13.1
-- scikit-learn v1.3.1
+- [Python](https://www.python.org/downloads/) 3.9 (miniconda env was used in the original experiment)
+- [Keras-TensorFlow](https://keras.io/getting_started/) v2.13.1
+- [scikit-learn](https://scikit-learn.org/stable/install.html) v1.3.1
 
 - NOTE: other blockchain testnets and compilation methods should also work, configurations may vary.
 ---
