@@ -1,3 +1,8 @@
+![Python](https://img.shields.io/badge/python-3.9-green)
+![License](https://img.shields.io/github/license/okhobian/decentralized-situ)
+![Last Commit](https://img.shields.io/github/last-commit/okhobian/decentralized-situ)
+
+
 # Verifiable Personalized Mutual-Learning based on Blockchain and zk-SNARK
 
 
